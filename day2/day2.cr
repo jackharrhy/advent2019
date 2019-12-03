@@ -1,4 +1,5 @@
 m = [] of Int32
+c = 0
 
 STDIN.each_line do |line|
   line.split(",").each do |i|
@@ -6,12 +7,7 @@ STDIN.each_line do |line|
   end
 end
 
-c = 0
-
 until m[c] == 99
-  puts "machine: #{m}"
-  puts "current: #{c} - #{m[c]}"
-
   p1 = m[c+1]
   p2 = m[c+2]
   p3 = m[c+3]
@@ -25,7 +21,4 @@ until m[c] == 99
   c += 4
 end
 
-puts "\nCOMPLETE"
-puts "machine: #{m}"
-puts "current: #{c} - #{m[c]}"
-puts "value as machine[0] = #{m[0]}"
+puts m[0]

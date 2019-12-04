@@ -10,9 +10,9 @@ def run(m)
   c = 0
 
   until m[c] == 99
-    p1 = m[c+1]
-    p2 = m[c+2]
-    p3 = m[c+3]
+    p1 = m[c + 1]
+    p2 = m[c + 2]
+    p3 = m[c + 3]
 
     case m[c]
     when 1

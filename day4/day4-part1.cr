@@ -19,7 +19,7 @@ range.each do |num|
 
   fail = true if !double_exists
 
-  found += 1 if !fail 
+  found += 1 if !fail
 end
 
 puts found

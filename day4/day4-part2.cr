@@ -1,4 +1,4 @@
-#range = 347312..805915
+# range = 347312..805915
 range = 111122..111122
 
 found = 0
@@ -17,7 +17,7 @@ range.each do |num|
       if !doubles.has_key? n
         doubles[n] = 2
       else
-        doubles[n] += 1 
+        doubles[n] += 1
       end
     end
 
@@ -31,7 +31,7 @@ range.each do |num|
 
   exit 0
 
-  found += 1 if !fail 
+  found += 1 if !fail
 end
 
 puts found

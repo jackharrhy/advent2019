@@ -2,7 +2,7 @@ class Planet
   property name : String = ""
   property child : Array(Planet) = [] of Planet
   property parent : Array(Planet) = [] of Planet
-end 
+end
 
 galaxy = Hash(String, Planet).new
 

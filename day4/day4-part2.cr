@@ -1,12 +1,13 @@
-# range = 347312..805915
-range = 111122..111122
+range = 347312..805915
 
 found = 0
 
 range.each do |num|
   fail = false
+  double_exists = false
   last = -1
-  doubles = Hash(Int32, Int32).new
+
+  groups = Hash(Int32, Int32).new
 
   num.to_s.chars.each do |n_as_char|
     next if fail
@@ -14,10 +15,10 @@ range.each do |num|
     n = n_as_char.to_i
 
     if last == n
-      if !doubles.has_key? n
-        doubles[n] = 2
+      if !groups.has_key? n
+        groups[n] = 2
       else
-        doubles[n] += 1
+        groups[n] += 1
       end
     end
 
@@ -25,13 +26,13 @@ range.each do |num|
     last = n
   end
 
-  # iterate through found doubles
-
-  pp doubles
-
-  exit 0
-
-  found += 1 if !fail
+  if !fail && groups.size > 0
+    fail = true
+    groups.each do |group|
+      fail = false if group[1] == 2
+    end
+    found += 1 if !fail
+  end
 end
 
 puts found

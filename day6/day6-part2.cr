@@ -34,23 +34,25 @@ end
 you = galaxy["YOU"]
 san = galaxy["SAN"]
 
-puts you
-puts san
+parents_of_you = Hash(String, Tuple(Planet, Int32)).new
+cur_planet = you
+parent_num = -1
 
-exit 0
-
-total_parents = 0
-
-galaxy.each do |name, planet|
-  parents = 0
-  cur_planet = planet
-
-  while cur_planet.is_a? Planet && cur_planet.parent.size != 0
-    parents += 1
-    cur_planet = cur_planet.parent[0]
-  end
-
-  total_parents += parents
+while cur_planet.is_a? Planet && cur_planet.parent.size != 0
+  parents_of_you[cur_planet.name] = {cur_planet, parent_num}
+  cur_planet = cur_planet.parent[0]
+  parent_num += 1
 end
 
-puts "total: #{total_parents}"
+cur_planet = san
+parent_num = -1
+
+while cur_planet.is_a? Planet && cur_planet.parent.size != 0
+  parent_num += 1
+  cur_planet = cur_planet.parent[0]
+  if parents_of_you.has_key? cur_planet.name
+    you_num = parents_of_you[cur_planet.name][1]
+    puts parent_num + you_num
+    break
+  end
+end

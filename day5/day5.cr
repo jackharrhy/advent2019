@@ -4,6 +4,10 @@ class IntM
     2 => 4,
     3 => 2,
     4 => 2,
+    5 => 3,
+    6 => 3,
+    7 => 4,
+    8 => 4,
   }
 
   @m : Array(Int32)
@@ -22,8 +26,8 @@ class IntM
     modes.reverse
   end
 
+  # make a note of both the relative positions and actual resolved values
   def position_and_params(modes)
-    # make a note of both the actual positions and values of the items
     positions = [] of Int32
     params = [] of Int32
 
@@ -52,15 +56,18 @@ class IntM
       # parse out the opcode, the right-most two digits
       instructs = @m[@c].to_s
       opcode = instructs[instructs.size - 2, instructs.size].to_i
-      raise "opcode more than 4!" if opcode > 4
+      raise "opcode more than 8!" if opcode > 8
 
       opcode_jump = @@opcode_map[opcode]
 
       modes = parse_modes instructs
       positions, params = position_and_params modes
 
+      puts "c: #{@c}, #{@m[@c,opcode_jump]}" if @debug
       puts "instructs: #{instructs}, opcode: #{opcode}" if @debug
       puts "modes: #{modes}, positions: #{positions}, params: #{params}" if @debug
+
+      should_opcode_jump = true
 
       case opcode
       when 1
@@ -72,9 +79,30 @@ class IntM
         @m[positions[0]] = int
       when 4
         puts params[0]
+      when 5
+        # if first param is non-zero, pointer should be second param
+        if params[0] != 0
+          should_opcode_jump = false
+          @c = params[1]
+        end
+      when 6
+        # if first param is zero, pointer should be second param
+        if params[0] == 0
+          should_opcode_jump = false
+          @c = params[1]
+        end
+      when 7
+        # if the first parameter is less than the second parameter,
+        # store 1 in the position given by the third parameter, otherwise store 0
+        @m[positions[2]] = params[0] < params[1] ? 1 : 0
+      when 8
+        # greater than
+        # if the first parameter is equal to the second parameter,
+        # store 1 in the position given by the third parameter, otherwise store 0
+        @m[positions[2]] = params[0] == params[1] ? 1 : 0
       end
 
-      @c += opcode_jump
+      @c += opcode_jump if should_opcode_jump
     end
   end
 end
@@ -87,7 +115,7 @@ STDIN.each_line do |line|
   end
 end
 
-args = [1]
+args = [5]
 
 machine = IntM.new m
 machine.run args

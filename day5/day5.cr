@@ -25,7 +25,7 @@ def run(m, args)
   }
 
   until m[c] == 99
-    puts "\nc: #{c} - #{m[c,6]}..." if d
+    puts "\nc: #{c} - #{m[c, 6]}..." if d
 
     # parse out the opcode, the right-most two digits
     instructs = m[c].to_s

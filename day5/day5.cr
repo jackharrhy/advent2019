@@ -48,61 +48,65 @@ class IntM
     {positions, params}
   end
 
+  def cycle(args)
+    # parse out the opcode, the right-most two digits
+    instructs = @m[@c].to_s
+    opcode = instructs[instructs.size - 2, instructs.size].to_i
+    raise "opcode more than 8!" if opcode > 8
+
+    opcode_jump = @@opcode_map[opcode]
+
+    modes = parse_modes instructs
+    positions, params = position_and_params modes
+
+    puts "c: #{@c}, #{@m[@c, opcode_jump]}" if @debug
+    puts "instructs: #{instructs}, opcode: #{opcode}" if @debug
+    puts "modes: #{modes}, positions: #{positions}, params: #{params}" if @debug
+
+    should_opcode_jump = true
+
+    case opcode
+    when 1
+      @m[positions[2]] = params[0] + params[1]
+    when 2
+      @m[positions[2]] = params[0] * params[1]
+    when 3
+      int = args.shift
+      @m[positions[0]] = int
+    when 4
+      puts params[0]
+    when 5
+      # if first param is non-zero, pointer should be second param
+      if params[0] != 0
+        should_opcode_jump = false
+        @c = params[1]
+      end
+    when 6
+      # if first param is zero, pointer should be second param
+      if params[0] == 0
+        should_opcode_jump = false
+        @c = params[1]
+      end
+    when 7
+      # if the first parameter is less than the second parameter,
+      # store 1 in the position given by the third parameter, otherwise store 0
+      @m[positions[2]] = params[0] < params[1] ? 1 : 0
+    when 8
+      # greater than
+      # if the first parameter is equal to the second parameter,
+      # store 1 in the position given by the third parameter, otherwise store 0
+      @m[positions[2]] = params[0] == params[1] ? 1 : 0
+    end
+
+    @c += opcode_jump if should_opcode_jump
+  end
+
   def run(args)
     @c = 0
     @m = @machine.clone
 
     until @m[@c] == 99
-      # parse out the opcode, the right-most two digits
-      instructs = @m[@c].to_s
-      opcode = instructs[instructs.size - 2, instructs.size].to_i
-      raise "opcode more than 8!" if opcode > 8
-
-      opcode_jump = @@opcode_map[opcode]
-
-      modes = parse_modes instructs
-      positions, params = position_and_params modes
-
-      puts "c: #{@c}, #{@m[@c,opcode_jump]}" if @debug
-      puts "instructs: #{instructs}, opcode: #{opcode}" if @debug
-      puts "modes: #{modes}, positions: #{positions}, params: #{params}" if @debug
-
-      should_opcode_jump = true
-
-      case opcode
-      when 1
-        @m[positions[2]] = params[0] + params[1]
-      when 2
-        @m[positions[2]] = params[0] * params[1]
-      when 3
-        int = args.shift
-        @m[positions[0]] = int
-      when 4
-        puts params[0]
-      when 5
-        # if first param is non-zero, pointer should be second param
-        if params[0] != 0
-          should_opcode_jump = false
-          @c = params[1]
-        end
-      when 6
-        # if first param is zero, pointer should be second param
-        if params[0] == 0
-          should_opcode_jump = false
-          @c = params[1]
-        end
-      when 7
-        # if the first parameter is less than the second parameter,
-        # store 1 in the position given by the third parameter, otherwise store 0
-        @m[positions[2]] = params[0] < params[1] ? 1 : 0
-      when 8
-        # greater than
-        # if the first parameter is equal to the second parameter,
-        # store 1 in the position given by the third parameter, otherwise store 0
-        @m[positions[2]] = params[0] == params[1] ? 1 : 0
-      end
-
-      @c += opcode_jump if should_opcode_jump
+      cycle args
     end
   end
 end
